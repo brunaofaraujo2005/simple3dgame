@@ -1,7 +1,6 @@
-#include "TypeDefs.h"
+#pragma once
 
-#include <fstream>				//Om files te streamen
-#include <vector>
+#include "TypeDefs.h"
 
 //TODO: 
 
@@ -15,15 +14,9 @@
 	#S  C  #
 	########
 */
-using namespace std;
 
 class Level{
 private:
-	struct position{                                //Bevat de positie x, y, platform
-        unsigned int x;
-        unsigned int y;
-        unsigned int platform;
-    };
 	unsigned int _numPlatforms;		//Aantal aanwezige platforms
 	unsigned int _width, _height;	//Bevat de breedte en hoogte van het level
 	position _startPosition;		//Bevat de startlocatie
@@ -40,6 +33,7 @@ public:
 	unsigned int getHeight(){return _height;};
 	string getPlatform(unsigned int platform);
 	unsigned int getPlatforms(){return _numPlatforms;};
+	position getStartPosition(){return _startPosition;};
 	unsigned int getStartPlatForm(){return _startPosition.platform;};
 	unsigned int getStartX(){return _startPosition.x;};
 	unsigned int getStartY(){return _startPosition.y;}
