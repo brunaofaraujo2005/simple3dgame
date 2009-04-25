@@ -5,7 +5,7 @@ using namespace std;
 bool main(){
 	RoboRally rrGame;
 
-	cout << "Naar voren: " << rrGame.canMove(FORWARD) ? "true" : "false";
+/*	cout << "Naar voren: " << rrGame.canMove(FORWARD) ? "true" : "false";
 	cout << "\r\nNaar achteren: " << rrGame.canMove(BACKWARD) ? "true" : "false";
 	cout << "\r\n\r\nDraai naar links";
 	rrGame.turnRobotLeft();
@@ -20,7 +20,27 @@ bool main(){
 	rrGame.turnRobotRight();
 	cout << "\r\nNaar voren: " << rrGame.canMove(FORWARD) ? "true" : "false";
 	cout << "\r\nNaar achteren: " << rrGame.canMove(BACKWARD) ? "true" : "false";
+*/
+	char invoer = '0';
+	while (invoer != 'q'){
+		cout << rrGame.getCurState();
+		cin >> invoer;
 
+		switch(invoer){
+			case 'a':
+				rrGame.turnRobotLeft();
+				break;
+			case 'd':
+				rrGame.turnRobotRight();
+				break;
+			case 'w':
+				rrGame.moveRobot(FORWARD);
+				break;
+			case 's':
+				rrGame.moveRobot(BACKWARD);
+				break;
+		}
+	}
 
 	return 0;
 }
