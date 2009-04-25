@@ -4,7 +4,7 @@
 using namespace std;
 
 bool main(){
-	int _numLevels;
+	int _numLevels = -1;
 	vector<Level> _levels;
 
 	string mazeFile = "maze.txt";
@@ -14,25 +14,22 @@ bool main(){
 	if (mazeStream.fail())
 		return 0; //Fout bij openen bestand
 
-	//Bestand lezen tot aantal levels
+	//Bestand lezen tot aantal levels bekend is
 	char chrLine[201];
-	string strLine;
 
-	while(!mazeStream.eof()){
+	while (_numLevels == -1){
 		mazeStream.getline(chrLine, 200);
-		strLine.assign(chrLine);
 		if ((chrLine[0] != '%') && (chrLine[0] != 0)){ //Commentaar en lege regels overslaan
 			//eerste waarde is het aantal levels.
-			_numLevels = atoi(chrLine);		
-
-			//Hier de levels aanmaken //LET OP! kunnen er meerdere zijn
-			while(!mazeStream.eof()){
-				Level level;
-				level = Level(mazeStream);
-				_levels.push_back(level);
-			}
+			_numLevels = atoi(chrLine);			
 		}
+	}
 
+	//Levels ophalen
+	while (_numLevels != _levels.size()){
+		Level level;
+		level = Level(mazeStream);
+		_levels.push_back(level);		
 	}
 
 	return 0;
