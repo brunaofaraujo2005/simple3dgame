@@ -162,11 +162,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\game.cpp"
+				RelativePath=".\Level.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Level.cpp"
+				RelativePath=".\RoboRally.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\week1_a.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\week1_b.cpp"
 				>
 			</File>
 		</Filter>
@@ -177,6 +193,10 @@
 			>
 			<File
 				RelativePath=".\Level.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RoboRally.h"
 				>
 			</File>
 			<File
