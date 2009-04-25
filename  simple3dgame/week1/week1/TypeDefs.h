@@ -14,4 +14,6 @@ struct position{				//Bevat de positie x, y, platform
 };
 
 //Om makkelijk te werken een enumeration van veelgebruikte "termen".
-enum {START, EXIT, SPACE, HOLE, LIFT, WATER, BATTERY, CHIP, WALL, NORTH, EAST, SOUTH, WEST};
+enum elements{START, EXIT, SPACE, HOLE, LIFT, WATER, BATTERY, CHIP, WALL};
+enum orientations{NORTH, EAST, SOUTH, WEST};
+enum directions{FORWARD, BACKWARD};

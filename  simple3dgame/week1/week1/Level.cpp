@@ -11,7 +11,7 @@ Level::Level(ifstream &mazeStream){
 	unsigned int step = 0;					//Houdt bij welke waarde er ingelezen wordt
 	unsigned int lineNumber = 0;			//Houdt het regelnummer bij van het level (Y-as)
 	unsigned int platform = 0;				//Houdt het niveau bij
-	unsigned int symbol;					//Bevat het symbool wat op de betreffende positie staat
+	elements element;						//Bevat het symbool wat op de betreffende positie staat
 	
 	while(platform != _numPlatforms){
 		mazeStream.getline(chrLine, 200);
@@ -36,37 +36,37 @@ Level::Level(ifstream &mazeStream){
 						//Vertaal symbool naar waarde
 						switch (chrLine[i]){
 							case 'S':
-								symbol = START;
+								element = START;
 								_startPosition.platform = platform;
 								_startPosition.x = i;
 								_startPosition.y = lineNumber;
 								break;
 							case 'X':
-								symbol = EXIT;
+								element = EXIT;
 								break;
 							case 'H':
-								symbol = HOLE;
+								element = HOLE;
 								break;
 							case 'L':
-								symbol = LIFT;
+								element = LIFT;
 								break;
 							case 'W':
-								symbol = WATER;
+								element = WATER;
 								break;
 							case 'B':
-								symbol = BATTERY;
+								element = BATTERY;
 								break;
 							case 'C':
-								symbol = CHIP;
+								element = CHIP;
 								break;
 							case '#':
-								symbol = WALL;
+								element = WALL;
 								break;
 							default:
-								symbol = SPACE;
+								element = SPACE;
 								break;
 						}
-						_maze.push_back(symbol);	//Symbool toevoegen aan vector, wordt automatich geteld.
+						_maze.push_back(element);	//Symbool toevoegen aan vector, wordt automatich geteld.
 					}
 					lineNumber++;
 					//Controleren of het einde van het platform is bereikt.
@@ -79,9 +79,15 @@ Level::Level(ifstream &mazeStream){
 	}
 }
 
-unsigned int Level::getElement(unsigned int x, unsigned int y, unsigned int platform){
+//Geeft het element terug wat zich op een bepaalde positie bevind.
+elements Level::getElement(unsigned int x, unsigned int y, unsigned int platform){
 	//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
 	return _maze[(((y * _width) + x) + (platform * _width *_height))];
+}
+
+//Geeft het element terug wat zich op een bepaalde positie bevind.
+elements Level::getElement(position point){
+	return getElement(point.x, point.y, point.platform);
 }
 
 //Geeft het platform terug in een string (ASCII) representatie
@@ -127,7 +133,7 @@ string Level::getPlatform(unsigned int platform){
 }
 
 //Verander een bepaalde positie in het level
-void Level::setElement(unsigned int x, unsigned int y, unsigned int platform, unsigned int element){
+void Level::setElement(unsigned int x, unsigned int y, unsigned int platform, elements element){
 	unsigned int position;
 	//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
 	position = (((y * _width) + x) + (platform * _width * _height));
