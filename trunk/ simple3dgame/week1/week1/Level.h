@@ -1,3 +1,5 @@
+#include "TypeDefs.h"
+
 #include <fstream>				//Om files te streamen
 #include <vector>
 
@@ -22,7 +24,6 @@ private:
         unsigned int y;
         unsigned int platform;
     };
-	enum{START, EXIT, SPACE, HOLE, LIFT, WATER, BATTERY, CHIP, WALL};	//Bevat level elementen
 	unsigned int _numPlatforms;		//Aantal aanwezige platforms
 	unsigned int _width, _height;	//Bevat de breedte en hoogte van het level
 	position _startPosition;		//Bevat de startlocatie
@@ -31,10 +32,14 @@ public:
 	Level();						//Default constructor
 	Level(ifstream &mazeStrean);	//Constructor die een doolhof inleest.
 	~Level();
+	//Setters
+	void setSymbol(unsigned int x, unsigned int y, unsigned int platform, unsigned int symbol);
 	//Getters
 	unsigned int getWidth(){return _width;};
 	unsigned int getHeight(){return _height;};
-	unsigned int getStartX(){return _startPosition.x;};
-	unsigned int getStartY(){return _startPosition.y;};
+	string getPlatform(unsigned int platform);
+	unsigned int getPlatforms(){return _numPlatforms;};
 	unsigned int getStartPlatForm(){return _startPosition.platform;};
+	unsigned int getStartX(){return _startPosition.x;};
+	unsigned int getStartY(){return _startPosition.y;}
 };

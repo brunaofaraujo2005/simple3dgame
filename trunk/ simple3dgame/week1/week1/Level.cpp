@@ -49,8 +49,10 @@ Level::Level(ifstream &mazeStream){
 								break;
 							case 'L':
 								symbol = LIFT;
+								break;
 							case 'W':
 								symbol = WATER;
+								break;
 							case 'B':
 								symbol = BATTERY;
 								break;
@@ -75,6 +77,56 @@ Level::Level(ifstream &mazeStream){
 			}
 		}	
 	}
+}
+
+//Geeft het platform terug in een string (ASCII) representatie
+string Level::getPlatform(unsigned int platform){
+	string strPlatform = "";
+	for(unsigned int y=0; y < _height; y++){
+		for(unsigned int x=0; x < _width; x++){
+			//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
+			switch (_maze[(((y * _width) + x) + (platform * _width *_height))]){
+				case START:
+					strPlatform += "S";
+					break;
+				case EXIT:
+					strPlatform += "X";
+					break;
+				case HOLE:
+					strPlatform += "H";
+					break;
+				case LIFT:
+					strPlatform += "L";
+					break;
+				case WATER:
+					strPlatform += "W";
+					break;
+				case BATTERY:
+					strPlatform += "B";
+					break;
+				case CHIP:
+					strPlatform += "C";
+					break;
+				case WALL:
+					strPlatform += "#";
+					break;
+				default:
+					strPlatform += " ";
+					break;
+			}
+		}
+		//Toevoegen van endline
+		strPlatform += "\r\n";
+	}
+	return strPlatform;
+}
+
+//Verander een bepaalde positie in het level
+void Level::setSymbol(unsigned int x, unsigned int y, unsigned int platform, unsigned int symbol){
+	unsigned int position;
+	//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
+	position = (((y * _width) + x) + (platform * _width * _height));
+	_maze[position] = symbol;
 }
 
 //Deconstructor
