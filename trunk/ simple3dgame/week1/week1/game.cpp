@@ -37,11 +37,14 @@ bool main(){
 	//Ophalen leven en iets veranderen test code
 	Level level1;
 	level1 = _levels[0];
-	//level1.setSymbol(7,13,0,15);
+	level1.setElement(7,13,0,WATER);
 	string strPlatform;
 	strPlatform =level1.getPlatform(0);
 
 	cout << strPlatform;
+	
+	unsigned int element;
+	element = level1.getElement(7,13,0);
 
 	return 0;
 }

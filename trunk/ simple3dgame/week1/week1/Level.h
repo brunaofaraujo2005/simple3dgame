@@ -33,8 +33,9 @@ public:
 	Level(ifstream &mazeStrean);	//Constructor die een doolhof inleest.
 	~Level();
 	//Setters
-	void setSymbol(unsigned int x, unsigned int y, unsigned int platform, unsigned int symbol);
+	void setElement(unsigned int x, unsigned int y, unsigned int platform, unsigned int symbol);
 	//Getters
+	unsigned int getElement(unsigned int x, unsigned int y, unsigned int platform);
 	unsigned int getWidth(){return _width;};
 	unsigned int getHeight(){return _height;};
 	string getPlatform(unsigned int platform);
