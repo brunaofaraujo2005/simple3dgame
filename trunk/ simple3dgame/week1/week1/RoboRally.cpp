@@ -6,6 +6,7 @@ RoboRally::RoboRally()
 	init();
 }
 
+//Globale initialisatie
 void RoboRally::init(){
 	string file = "maze.txt";
 	_numLevels = 0;
@@ -25,8 +26,40 @@ void RoboRally::initLevel(unsigned int level){
 	_curLevelNr = level;
 	_curLevel = _levels[level-1];
 	_curPosition = _curLevel.getStartPosition();
-	_curDirection = NORTH;	//Eventueel aanpassen, zodat deze nooit met neus naar muur begint.
+	_curOrientation = NORTH;	//Eventueel aanpassen, zodat deze nooit met neus naar muur begint.
 }
+
+//Controleert of de robot vooruit kan i.v.m. muur
+bool RoboRally::canMove(directions direction){
+	//Afhankelijk van vooruit of achteruit
+	int move;
+	if (direction == FORWARD)
+		move = 1;
+	else
+		move = -1;
+	//Afhankelijk van de orientatie welke kant op tellen
+	switch (_curOrientation){
+		case NORTH:
+			if (_curLevel.getElement(_curPosition.x, _curPosition.y - move, _curPosition.platform) != WALL)
+				return true;
+			break;
+		case EAST:
+			if (_curLevel.getElement(_curPosition.x - move, _curPosition.y, _curPosition.platform) != WALL)
+				return true;
+			break;
+		case SOUTH:
+			if (_curLevel.getElement(_curPosition.x, _curPosition.y + move, _curPosition.platform) != WALL)
+				return true;
+			break;
+		case WEST:
+			if (_curLevel.getElement(_curPosition.x + move, _curPosition.y, _curPosition.platform) != WALL)
+				return true;
+			break;
+		default:
+			return false;
+	}
+	return false;
+};
 
 //Laad levels in
 bool RoboRally::readLevels(string &file){
@@ -56,6 +89,22 @@ bool RoboRally::readLevels(string &file){
 
 	return true;
 }
+
+//Draait de robot linksom
+void RoboRally::turnRobotLeft(){
+	if (_curOrientation == NORTH)
+		_curOrientation = WEST;
+	else
+		_curOrientation--;
+};
+
+//Draait de robot rechtsom
+void RoboRally::turnRobotRight(){
+	if (_curOrientation == WEST)
+		_curOrientation = NORTH;
+	else
+		_curOrientation++;
+};
 
 //Deconstructor
 RoboRally::~RoboRally(void)
