@@ -79,6 +79,11 @@ Level::Level(ifstream &mazeStream){
 	}
 }
 
+unsigned int Level::getElement(unsigned int x, unsigned int y, unsigned int platform){
+	//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
+	return _maze[(((y * _width) + x) + (platform * _width *_height))];
+}
+
 //Geeft het platform terug in een string (ASCII) representatie
 string Level::getPlatform(unsigned int platform){
 	string strPlatform = "";
@@ -122,11 +127,11 @@ string Level::getPlatform(unsigned int platform){
 }
 
 //Verander een bepaalde positie in het level
-void Level::setSymbol(unsigned int x, unsigned int y, unsigned int platform, unsigned int symbol){
+void Level::setElement(unsigned int x, unsigned int y, unsigned int platform, unsigned int element){
 	unsigned int position;
 	//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
 	position = (((y * _width) + x) + (platform * _width * _height));
-	_maze[position] = symbol;
+	_maze[position] = element;
 }
 
 //Deconstructor
