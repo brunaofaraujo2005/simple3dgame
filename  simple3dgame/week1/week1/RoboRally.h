@@ -7,6 +7,7 @@ class RoboRally{
 private:
 	//Globale constanten
 	static const unsigned int _chipPoints = 10;	//Aantal punten een chip oplevert
+	static const unsigned int _batteryFuel = 10;//Hoeveelheid energie een battery oplevert.
 	static const unsigned int _turnCost = 0;	//Hoeveel energie kost het om te draaien
 	static const unsigned int _walkCost = 1;	//Hoeveel energie kost het om een stap te zetten
 	//Global vars
@@ -26,12 +27,15 @@ private:
 
 	bool readLevels(string &file);				//Leest de levels uit een bestand in
 public:
-	RoboRally();
-	~RoboRally();	
-	void turnRobotLeft();
-	void turnRobotRight();
+	RoboRally();								//Constructor
+	~RoboRally();								//Deconstructor
+	void turnRobotLeft();						//Draai de robot naar links
+	void turnRobotRight();						//Draai de robot naar rechts
+	void moveRobot(directions direction);		//Verplaats de robot voor of achteruit
 
+	//********* tijdelijk publiekelijk *********
 	bool canMove(directions direction);			//Controleert of de robot vooruit kan i.v.m. muur
+
 	//Getters
 	position getCurrentPosition(){return _curPosition;};
 	unsigned int getCurPositionPlatform(){return _curPosition.platform;};
@@ -41,5 +45,4 @@ public:
 	unsigned int getEnergy(){return _energy;};
 	unsigned int getLives(){return _lives;};
 	unsigned int getScore(){return _score;};
-
 };
