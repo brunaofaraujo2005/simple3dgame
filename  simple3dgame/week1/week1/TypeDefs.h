@@ -2,6 +2,7 @@
 
 #include <fstream>				
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -17,3 +18,11 @@ struct position{				//Bevat de positie x, y, platform
 enum elements{START, EXIT, SPACE, HOLE, LIFT, WATER, BATTERY, CHIP, WALL};
 enum orientations{NORTH, EAST, SOUTH, WEST};
 enum directions{FORWARD, BACKWARD};
+
+//To string functie om datatype naar een string te zetten.
+template <class DataType>
+inline string toString(const DataType& input){
+	stringstream stream;
+	stream << input;
+	return stream.str();
+}

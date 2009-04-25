@@ -6,6 +6,8 @@
 class RoboRally{
 private:
 	//Globale constanten
+	static const unsigned int _startEnergy = 50;//Hoeveel energie je bij start krijgt
+	static const unsigned int _startLives = 03;	//Aantal levens waar je mee begint
 	static const unsigned int _chipPoints = 10;	//Aantal punten een chip oplevert
 	static const unsigned int _batteryFuel = 10;//Hoeveelheid energie een battery oplevert.
 	static const unsigned int _turnCost = 0;	//Hoeveel energie kost het om te draaien
@@ -37,6 +39,7 @@ public:
 	bool canMove(directions direction);			//Controleert of de robot vooruit kan i.v.m. muur
 
 	//Getters
+	string getCurState();
 	position getCurrentPosition(){return _curPosition;};
 	unsigned int getCurPositionPlatform(){return _curPosition.platform;};
 	unsigned int getCurPositionX(){return _curPosition.x;};

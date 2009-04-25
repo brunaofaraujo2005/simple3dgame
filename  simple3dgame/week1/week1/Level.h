@@ -27,6 +27,7 @@ public:
 	~Level();
 	//Setters
 	void setElement(unsigned int x, unsigned int y, unsigned int platform, elements element);
+	void setElement(position point, elements element);
 	//Getters
 	elements getElement(unsigned int x, unsigned int y, unsigned int platform);
 	elements getElement(position point);

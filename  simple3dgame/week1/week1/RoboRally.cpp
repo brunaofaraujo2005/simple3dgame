@@ -15,8 +15,8 @@ void RoboRally::init(){
 	if (_numLevels > 0)
 		initLevel(1);
 
-	_energy = 50;
-	_lives = 3;
+	_energy = _startEnergy;
+	_lives = _startLives;
 	_score = 0;
 }
 
@@ -44,7 +44,7 @@ bool RoboRally::canMove(directions direction){
 				return true;
 			break;
 		case EAST:
-			if (_curLevel.getElement(_curPosition.x - move, _curPosition.y, _curPosition.platform) != WALL)
+			if (_curLevel.getElement(_curPosition.x + move, _curPosition.y, _curPosition.platform) != WALL)
 				return true;
 			break;
 		case SOUTH:
@@ -52,7 +52,7 @@ bool RoboRally::canMove(directions direction){
 				return true;
 			break;
 		case WEST:
-			if (_curLevel.getElement(_curPosition.x + move, _curPosition.y, _curPosition.platform) != WALL)
+			if (_curLevel.getElement(_curPosition.x - move, _curPosition.y, _curPosition.platform) != WALL)
 				return true;
 			break;
 		default:
@@ -60,6 +60,74 @@ bool RoboRally::canMove(directions direction){
 	}
 	return false;
 };
+
+//geef een representatie in een string
+string RoboRally::getCurState(){
+	//currentState = _curLevel.getPlatform(_curPosition.platform);
+	string currentState = "";
+	for(unsigned int y=0; y < _curLevel.getHeight(); y++){
+		for(unsigned int x=0; x < _curLevel.getWidth(); x++){
+			//Robot tekenen
+			if ((x == _curPosition.x) && (y == _curPosition.y)){
+				switch (_curOrientation){
+					case NORTH:
+						currentState += "^";
+						break;
+					case EAST:
+						currentState += ">";
+						break;
+					case SOUTH:
+						currentState += "v";
+						break;
+					case WEST:
+						currentState += "<";
+						break;
+				}
+			}
+			else{
+				//Terugrekenen naar index van vector ((y*w)+x+(p*w*h))
+				//switch (_maze[(((y * _width) + x) + (platform * _width *_height))]){
+				switch (_curLevel.getElement(x, y, _curPosition.platform)){
+					case START:
+						currentState += "S";
+						break;
+					case EXIT:
+						currentState += "X";
+						break;
+					case HOLE:
+						currentState += "H";
+						break;
+					case LIFT:
+						currentState += "L";
+						break;
+					case WATER:
+						currentState += "W";
+						break;
+					case BATTERY:
+						currentState += "B";
+						break;
+					case CHIP:
+						currentState += "C";
+						break;
+					case WALL:
+						currentState += "#";
+						break;
+					default:
+						currentState += " ";
+						break;
+				}
+			}
+		}
+		//Toevoegen van endline
+		currentState += "\r\n";
+	}
+
+	currentState += "\r\n\r\n";
+	currentState += "SCORE: " + toString(_score) + "\r\n";
+	currentState += "ENERGY: " + toString(_energy) + "\r\n";
+	currentState += "LIVES: " + toString(_lives) + "/" + toString(_startLives) + "\r\n";
+	return currentState;
+}
 
 //Verplaats de robot
 void RoboRally::moveRobot(directions direction){
@@ -79,7 +147,7 @@ void RoboRally::moveRobot(directions direction){
 				element = _curLevel.getElement(_curPosition);
 				break;
 			case EAST:
-				_curPosition.x = _curPosition.x - move;
+				_curPosition.x = _curPosition.x + move;
 				element = _curLevel.getElement(_curPosition);
 				break;
 			case SOUTH:
@@ -87,14 +155,14 @@ void RoboRally::moveRobot(directions direction){
 				element = _curLevel.getElement(_curPosition);
 				break;
 			case WEST:
-				_curPosition.x = _curPosition.x + move;
+				_curPosition.x = _curPosition.x - move;
 				element = _curLevel.getElement(_curPosition);
 				break;
 		}
 		switch (element){
 				case EXIT:
 					//Je gaat naar het volgende level
-					initLevel(_curLevelNr++);
+					initLevel(++_curLevelNr);
 					break;
 				case HOLE:
 					//Je gaat een niveau omlaag
@@ -105,17 +173,21 @@ void RoboRally::moveRobot(directions direction){
 					_curPosition.platform = _curPosition.platform + 1;
 					break;
 				case WATER:
-					//Kost leven en je gaat weer naar Start
+					//Kost leven en je gaat weer naar Start, energie wordt gereset
 					_lives--;
+					_energy = _startEnergy;
+					_curOrientation = NORTH;
 					_curPosition = _curLevel.getStartPosition();
 					break;
 				case BATTERY:
 					//Baterij energie level stijgt
 					_energy += _batteryFuel;
+					_curLevel.setElement(_curPosition, SPACE);
 					break;
 				case CHIP:
 					//Score wordt opgehoogd
 					_score += _chipPoints;
+					_curLevel.setElement(_curPosition, SPACE);
 					break;
 				default:	//SPACE
 					break;
@@ -124,8 +196,9 @@ void RoboRally::moveRobot(directions direction){
 
 		//de rest
 			//Controleren of de robot niet dood is
+			//Controleren of de energy niet op is!
 			//Controleren of deze niet door 2 Holes is gezakt
-			//Level ten einde ??
+			//Level ten einde;
 	}
 	else{ 
 		//MUUR

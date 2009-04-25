@@ -140,6 +140,10 @@ void Level::setElement(unsigned int x, unsigned int y, unsigned int platform, el
 	_maze[position] = element;
 }
 
+void Level::setElement(position point, elements element){
+	setElement(point.x, point.y, point.platform, element);
+}
+
 //Deconstructor
 Level::~Level(){
 }
