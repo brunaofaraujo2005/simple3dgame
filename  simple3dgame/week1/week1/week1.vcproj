@@ -179,6 +179,10 @@
 				RelativePath=".\Level.h"
 				>
 			</File>
+			<File
+				RelativePath=".\TypeDefs.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

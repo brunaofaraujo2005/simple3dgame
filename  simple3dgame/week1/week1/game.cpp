@@ -1,5 +1,7 @@
 #include "Level.h"
 #include <vector>
+#include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -31,6 +33,15 @@ bool main(){
 		level = Level(mazeStream);
 		_levels.push_back(level);		
 	}
+
+	//Ophalen leven en iets veranderen test code
+	Level level1;
+	level1 = _levels[0];
+	//level1.setSymbol(7,13,0,15);
+	string strPlatform;
+	strPlatform =level1.getPlatform(0);
+
+	cout << strPlatform;
 
 	return 0;
 }
