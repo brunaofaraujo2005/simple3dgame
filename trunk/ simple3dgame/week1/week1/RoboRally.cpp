@@ -61,6 +61,77 @@ bool RoboRally::canMove(directions direction){
 	return false;
 };
 
+//Verplaats de robot
+void RoboRally::moveRobot(directions direction){
+	elements element;
+	//Afhankelijk van vooruit of achteruit
+	int move;
+	if (direction == FORWARD)
+		move = 1;
+	else
+		move = -1;
+	
+	if (canMove(direction)){		
+		//Afhankelijk van de orientatie welke kant op tellen
+		switch (_curOrientation){
+			case NORTH:
+				_curPosition.y = _curPosition.y - move;
+				element = _curLevel.getElement(_curPosition);
+				break;
+			case EAST:
+				_curPosition.x = _curPosition.x - move;
+				element = _curLevel.getElement(_curPosition);
+				break;
+			case SOUTH:
+				_curPosition.y = _curPosition.y + move;
+				element = _curLevel.getElement(_curPosition);
+				break;
+			case WEST:
+				_curPosition.x = _curPosition.x + move;
+				element = _curLevel.getElement(_curPosition);
+				break;
+		}
+		switch (element){
+				case EXIT:
+					//Je gaat naar het volgende level
+					initLevel(_curLevelNr++);
+					break;
+				case HOLE:
+					//Je gaat een niveau omlaag
+					_curPosition.platform = _curPosition.platform - 1;
+					break;
+				case LIFT:
+					//Je gaat een niveau omhoog
+					_curPosition.platform = _curPosition.platform + 1;
+					break;
+				case WATER:
+					//Kost leven en je gaat weer naar Start
+					_lives--;
+					_curPosition = _curLevel.getStartPosition();
+					break;
+				case BATTERY:
+					//Baterij energie level stijgt
+					_energy += _batteryFuel;
+					break;
+				case CHIP:
+					//Score wordt opgehoogd
+					_score += _chipPoints;
+					break;
+				default:	//SPACE
+					break;
+		}
+		_energy -= _walkCost;
+
+		//de rest
+			//Controleren of de robot niet dood is
+			//Controleren of deze niet door 2 Holes is gezakt
+			//Level ten einde ??
+	}
+	else{ 
+		//MUUR
+	}
+}
+
 //Laad levels in
 bool RoboRally::readLevels(string &file){
 	char chrLine[201];
@@ -96,6 +167,7 @@ void RoboRally::turnRobotLeft(){
 		_curOrientation = WEST;
 	else
 		_curOrientation--;
+	_energy -= _turnCost;
 };
 
 //Draait de robot rechtsom
@@ -104,6 +176,7 @@ void RoboRally::turnRobotRight(){
 		_curOrientation = NORTH;
 	else
 		_curOrientation++;
+	_energy -= _turnCost;
 };
 
 //Deconstructor
