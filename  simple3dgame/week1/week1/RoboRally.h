@@ -20,13 +20,14 @@ private:
 	Level _curLevel;							//Bevat het huidige level
 	unsigned int _curLevelNr;					//Bevat het huidige level nummer
 	position _curPosition;						//Bevat de huidige positie van de robot
-	unsigned int _energy;						//Bevat het energielevel van de robot
-	unsigned int _lives;						//Bevat het aantal levens	
-	unsigned int _score;						//Bevat de score van de speler
+	unsigned int _curEnergy;					//Bevat het energielevel van de robot
+	unsigned int _curLives;						//Bevat het aantal levens	
+	unsigned int _curScore;						//Bevat de score van de speler
 	//Methoden
 	void init();								//Globale initialisatie
 	void initLevel(unsigned int level);			//Initialiseert een level
-
+	void refreshState();						//Voert alle game handelingen uit (na bijv. een stap).
+	void reInitLevel(unsigned int lives);		//Level wordt gereïnitialiseerd
 	bool readLevels(string &file);				//Leest de levels uit een bestand in
 public:
 	RoboRally();								//Constructor
@@ -45,7 +46,7 @@ public:
 	unsigned int getCurPositionX(){return _curPosition.x;};
 	unsigned int getCurPositionY(){return _curPosition.y;};
 	unsigned int getCurOrientation(){return _curOrientation;};
-	unsigned int getEnergy(){return _energy;};
-	unsigned int getLives(){return _lives;};
-	unsigned int getScore(){return _score;};
+	unsigned int getCurEnergy(){return _curEnergy;};
+	unsigned int getCurLives(){return _curLives;};
+	unsigned int getCurScore(){return _curScore;};
 };
