@@ -41,6 +41,7 @@ public:
 
 	//Getters
 	string getCurState();
+	Level getCurLevel(){return _curLevel;};
 	position getCurrentPosition(){return _curPosition;};
 	unsigned int getCurPositionPlatform(){return _curPosition.platform;};
 	unsigned int getCurPositionX(){return _curPosition.x;};

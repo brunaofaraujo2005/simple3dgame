@@ -57,6 +57,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="opengl32.lib glu32.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -183,6 +184,18 @@
 			</File>
 			<File
 				RelativePath=".\week1_b.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\week2_a.cpp"
 				>
 			</File>
 		</Filter>
