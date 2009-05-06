@@ -155,12 +155,26 @@ LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 		}
 		return 0;
 
-    case WM_CLOSE:
-		PostQuitMessage(0);
-		return 0;
-	
+    case WM_KEYDOWN:
+		switch (wParam) {
+			case VK_UP:
+				rrGame.moveRobot(FORWARD);
+				PostMessage(hWnd, WM_PAINT, 0, 0);
+				break;
+			case VK_DOWN:
+				rrGame.moveRobot(BACKWARD);
+				PostMessage(hWnd, WM_PAINT, 0, 0);
+				break;
+			case VK_RIGHT:
+				rrGame.turnRobotRight();
+				PostMessage(hWnd, WM_PAINT, 0, 0);
+				break;
+			case VK_LEFT:
+				rrGame.turnRobotLeft();
+				PostMessage(hWnd, WM_PAINT, 0, 0);
+				break;
+		}
 	}
-
     return DefWindowProc(hWnd, uMsg, wParam, lParam); 
 } 
 
