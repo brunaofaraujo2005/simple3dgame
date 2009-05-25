@@ -75,6 +75,10 @@ void display(){
 					textX = 1;
 					textY = 0;
 					break;
+				default:	//Standaard space
+					textX = 0;
+					textY = 0;
+					break;
 			}
 			if ((rrGame.getCurPositionX() == x) && (rrGame.getCurPositionY() == y)){
 					switch (rrGame.getCurOrientation()){
