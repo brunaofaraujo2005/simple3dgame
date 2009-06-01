@@ -25,21 +25,9 @@ int i = 6;
 RoboRally rrGame;
 
 //Test met freeview
-float camX = 8.0;
+float camX = 0.0;
 float camY = 0.0;
-float camZ = 5.0;
-//static float x=0.0f,y=1.75f,z=5.0f;
-static float lx=0.0f,ly=0.0f,lz=-1.0f;
-
-void moveMeFlat(int direction) {
-	camX = camX + direction*0.1;
-	camZ = camZ + direction*0.1;
-	glLoadIdentity();
-//	gluLookAt(camX, camY, camZ, 
-//		      0.0,-5.0,-1.0,
-//			  0.0f,1.0f,0.0f);
-}
-
+float camZ = 15.0;
 
 void loadModels(){
 	//Misschien mooier om dit in een map te doen?
@@ -93,22 +81,16 @@ void keyboard(unsigned char key, int x, int y)
 		camZ -= 1.0;
 		break;
 	 case 's':
-		 //camY -= 1.0;
-		 moveMeFlat(-1);
+		 camY -= 1.0;
 		 break;
 	 case 'w':
-		 //camY += 1.0;
-		 moveMeFlat(1);
+		 camY += 1.0;
 		 break;
 	 case 'a':
-		 //angle -= 0.05f;
-		 //orientMe(angle);
 		 camX -= 1.0;
 		 break;
 	 case 'd':
 		 camX += 1.0;
-		 //angle += 0.05f;
-		 //orientMe(angle);
 		 break;
    }
    glutPostRedisplay();
@@ -153,21 +135,15 @@ void display(){
 	glLoadIdentity ();
 	  
 	gluLookAt(camX, camY, camZ, 
-		      0.0,0.0,-1.0,
+		      camX, camY, camZ-15,
 			  0.0f,1.0f,0.0f);
-//	gluLookAt(camX,camY,camZ		//Oog
-//			 ,camX + lx, camY + ly, camZ + lz,		//Waar kijk je naar
-//			 ,0.0,1.0,0.0);		//Up factor
 
-//gluLookAt(x, y, z, 
-//		  	x + lx,y + ly,z + lz,
-//			0.0f,1.0f,0.0f);
 
 	
 	//Level tekenen
 	//for (int z = 0; z < rrGame.getCurLevel().getPlatforms(); z++){
 		for (int x = 0; x < rrGame.getCurLevel().getWidth(); x++){
-			for (int y = rrGame.getCurLevel().getHeight(); y > -1 ; y--){
+			for (int y = 0; y < rrGame.getCurLevel().getHeight(); y++){
 				if (rrGame.getCurLevel().getElement(x,y,0) == WALL){
 					glPushMatrix();
 					glTranslatef(x,0,y);		//De Z as representeerd de Y uit de 2D wereld
