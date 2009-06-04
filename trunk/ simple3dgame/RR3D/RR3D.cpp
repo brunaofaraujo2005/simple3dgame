@@ -16,7 +16,10 @@
 
 using namespace std;
 
-static float ypoz = 0, zpoz = 0;
+//Objecten met obj, om naamconflict met typedefs te voorkomen
+enum objecten{OBJBATTERY,OBJCHIP,OBJEXIT,OBJLIFT,OBJPLATFORM,OBJROBOT,OBJWALL,OBJWATER};
+
+static float ypoz = 0, zpoz = 0, rotation = 0;
 //GLMmodel* pmodel1 = NULL;
 
 vector<GLMmodel*> _models;
@@ -24,7 +27,6 @@ vector<GLMmodel*> _models;
 void display();
 void reshape(int width, int height);
 
-int i = 6;
 RoboRally rrGame;
 
 //Test met freeview
@@ -39,26 +41,23 @@ void init(){
     glShadeModel(GL_SMOOTH);
 }
 
+//Inladen van de 3D objecten
 void loadModels(){
-	//Misschien mooier om dit in een map te doen?
 	//Controle toevoegen of alles goed ingeladen word
 	_models.resize(8);
-	_models[0] = glmReadOBJ("Battery.obj");
-	_models[1] = glmReadOBJ("Chip.obj");
-	_models[2] = glmReadOBJ("Exit.obj");
-	_models[3] = glmReadOBJ("Lift.obj");
-	_models[4] = glmReadOBJ("Platform.obj");
-	_models[5] = glmReadOBJ("Robot.obj");
-	_models[6] = glmReadOBJ("Wall.obj");
- 	_models[7] = glmReadOBJ("Water.obj");
+	_models[OBJBATTERY]		= glmReadOBJ("Battery.obj");
+	_models[OBJCHIP]		= glmReadOBJ("Chip.obj");
+	_models[OBJEXIT]		= glmReadOBJ("Exit.obj");
+	_models[OBJLIFT]		= glmReadOBJ("Lift.obj");
+	_models[OBJPLATFORM]	= glmReadOBJ("Platform.obj");
+	_models[OBJROBOT]		= glmReadOBJ("Robot.obj");
+	_models[OBJWALL]		= glmReadOBJ("Wall.obj");
+ 	_models[OBJWATER]		= glmReadOBJ("Water.obj");
+
 	for(unsigned int i=0;i<_models.size();i++){
 		if(_models[i]!=NULL){
 			// Schalen van de objecten
 			glmUnitize(_models[i]);
-			// These 2 functions calculate triangle and vertex normals from the geometry data.
-			// To be honest I had some problem with very complex models that didn't look to good because of how vertex normals were calculated
-			// So if you can export these directly from you modeling tool do it and comment these line
-			// 3DS Max can calculate these for you and GLM is perfectly capable of loading them
 			glmFacetNormals(_models[i]);        
 			glmVertexNormals(_models[i], 90.0);
 		}
@@ -90,12 +89,12 @@ void keyboard(unsigned char key, int x, int y)
 		 if (zpoz>360) zpoz=0;
          glutPostRedisplay();
          break;	
-	 case 'c':
-		 if (i == 7)
-			 i = 0;
-		 else
-			 i++;
-		 break;
+//	 case 'c':
+//		 if (i == 7)
+//			 i = 0;
+//		 else
+//			 i++;
+//		 break;
 	 case 'q':
 		camZ += 1.0;
 		break;
@@ -120,8 +119,8 @@ void keyboard(unsigned char key, int x, int y)
 
 void animate()
 {
-	ypoz+=0.5;
-	if (ypoz>360) ypoz=0;
+	rotation+=1;
+	if (rotation>360) rotation=0;
 	glutPostRedisplay();
 }
 
@@ -143,7 +142,7 @@ int main(int argc, char **argv){
 	glutKeyboardFunc(keyboard);									//De functie voor het keyboard
 
     //Do a little animation - rotate the object a bit so we can see it better DEBUG
-	//glutIdleFunc(animate);
+	glutIdleFunc(animate);
 	glutMainLoop();
 
 	return 0;	//Eind programma
@@ -154,62 +153,66 @@ void display(){
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 	  
-	gluLookAt(camX, camY, camZ, 
+	gluLookAt(camX, camY+15.0, camZ, 
 		      camX, camY, camZ-15,
 			  0.0f,1.0f,0.0f);
 
-
-	
-	//Level tekenen
+	//Level tekenen (momenteel 1 laag)
+	int p = 0;
 	//for (int z = 0; z < rrGame.getCurLevel().getPlatforms(); z++){
 		for (unsigned int x = 0; x < rrGame.getCurLevel().getWidth(); x++){
 			for (unsigned int y = 0; y < rrGame.getCurLevel().getHeight(); y++){
-				if (rrGame.getCurLevel().getElement(x,y,0) == WALL){
-					glPushMatrix();
-					glTranslatef(x,0,y);		//De Z as representeerd de Y uit de 2D wereld
-					glmDraw(_models[6], GLM_SMOOTH | GLM_TEXTURE);
-					glPopMatrix();
+				switch (rrGame.getCurLevel().getElement(x,y,0)){
+					case EXIT:
+						glPushMatrix();
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJEXIT], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
+					case SPACE:
+						glPushMatrix();
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
+					case LIFT:
+						glPushMatrix();
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJLIFT], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
+					case WATER:
+						glPushMatrix();
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJWATER], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
+					case BATTERY:
+						glPushMatrix();
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glRotatef(rotation,0,1,0);
+						glmDraw(_models[OBJBATTERY], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
+					case CHIP:
+						glPushMatrix();					
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glRotatef(rotation,0,1,0);
+						glmDraw(_models[OBJCHIP], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
+					case WALL:
+						glPushMatrix();
+						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJWALL], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						break;
 				}
 			}
 		}
 	//}
-//				glPushMatrix();
-//				glTranslatef(x,p,y);
-//				glmDraw(_objects[Wall], GLM_SMOOTH| GLM_TEXTURE);
-//				glPopMatrix();
 
-	//glPushMatrix();
-	//for (int y = rrGame.getCurLevel().getHeight(); y > 0 ; y--){
-	//	if (rrGame.getCurLevel().getElement(0,y,0) == WALL){
-	//		glTranslatef(0,0,-1);		
-	//		drawModel(i);
-	//	}
-	//}
-	//glPopMatrix();
-	//
-
-//	glTranslatef(0,0,0);	
-//	drawModel(i);
-//	glTranslatef(1,0,0);	
-//	drawModel(i);
-//	glTranslatef(1,0,0);	
-//	drawModel(i);
-
-
-	//glPushMatrix();	
-	// I added these to be able to rotate the whole scene so you can see the box and textures
-	//	glRotatef(ypoz,0,1,0);
-	//	glRotatef(zpoz,0,0,1);		
-	//	drawModel(i);
-	//	drawModel(i);
-	//glPopMatrix();
-
-	//glTranslatef(0,0,-1);
-	//glPushMatrix();	
-	//	drawModel(i);
-	//glPopMatrix();
-
-	//Sleep(5);
+	Sleep(5);
 	glutSwapBuffers();  
 	
 }
