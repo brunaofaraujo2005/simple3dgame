@@ -1,3 +1,8 @@
+/**
+TODO: - Onder chips (en batterijen?) moet een platform komen.
+*/
+
+
 #include "stdafx.h"
 #include <windows.h>
 #include <math.h>
@@ -6,8 +11,6 @@
 #include <gl\gl.h>
 #include <gl\glu.h>
 #include <gl\glut.h>
-
-
 
 #include "glm.h"
 //#include <gl\freeglut.h>
@@ -34,6 +37,8 @@ float camX = 0.0;
 float camY = 0.0;
 float camZ = 15.0;
 
+GLfloat scalefact;
+
 //Initialisatie
 void init(){
     glClearColor(0.7, 0.7, 0.7, 1.0);	//Schermkleur (achtergrond)
@@ -54,10 +59,13 @@ void loadModels(){
 	_models[OBJWALL]		= glmReadOBJ("Wall.obj");
  	_models[OBJWATER]		= glmReadOBJ("Water.obj");
 
+	//scalefact = glmUnitize(_models[OBJWALL]);
+
 	for(unsigned int i=0;i<_models.size();i++){
 		if(_models[i]!=NULL){
 			// Schalen van de objecten
 			glmUnitize(_models[i]);
+//			glScalef(scalefact, scalefact, scalefact);
 			glmFacetNormals(_models[i]);        
 			glmVertexNormals(_models[i], 90.0);
 		}
@@ -153,37 +161,41 @@ void display(){
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 	  
-	gluLookAt(camX, camY+15.0, camZ, 
+	gluLookAt(camX, camY+10.0, camZ, 
 		      camX, camY, camZ-15,
 			  0.0f,1.0f,0.0f);
 
 	//Level tekenen (momenteel 1 laag)
-	int p = 0;
-	//for (int z = 0; z < rrGame.getCurLevel().getPlatforms(); z++){
+//	int p = 1;
+	for (int p = 0; p < rrGame.getCurLevel().getPlatforms(); p++){
 		for (unsigned int x = 0; x < rrGame.getCurLevel().getWidth(); x++){
 			for (unsigned int y = 0; y < rrGame.getCurLevel().getHeight(); y++){
-				switch (rrGame.getCurLevel().getElement(x,y,0)){
+				switch (rrGame.getCurLevel().getElement(x,y,p)){
 					case EXIT:
 						glPushMatrix();
 						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glScalef(0.5,0.5,0.5);//test
 						glmDraw(_models[OBJEXIT], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case SPACE:
 						glPushMatrix();
 						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glScalef(0.5,0.5,0.5);//test
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case LIFT:
 						glPushMatrix();
 						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glScalef(0.5,0.5,0.5);//test
 						glmDraw(_models[OBJLIFT], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case WATER:
 						glPushMatrix();
 						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glScalef(0.5,0.5,0.5);//test
 						glmDraw(_models[OBJWATER], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
@@ -191,26 +203,28 @@ void display(){
 						glPushMatrix();
 						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
 						glRotatef(rotation,0,1,0);
+						glScalef(0.5,0.5,0.5);//test
 						glmDraw(_models[OBJBATTERY], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case CHIP:
-						glPushMatrix();					
+						glPushMatrix();
 						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
-						glRotatef(rotation,0,1,0);
+						glRotatef(rotation,0,1,0);					
+						glScalef(0.5,0.5,0.5);//test
 						glmDraw(_models[OBJCHIP], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case WALL:
 						glPushMatrix();
-						glTranslatef(x,p,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p+1.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJWALL], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 				}
 			}
 		}
-	//}
+	}
 
 	Sleep(5);
 	glutSwapBuffers();  
