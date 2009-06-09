@@ -31,7 +31,8 @@ void reshape(int width, int height);
 
 RoboRally rrGame;
 
-bool _freeView = false;
+bool _freeView = false;					//Freeview (vrij rondvliegen met camera
+bool _thirdPerson = true;				//Thirdperson
 float eyeX,eyeY,eyeZ;					//Camerstandpunten
 float lookX, lookZ;						//Waar wordt er naar gekeken vanuit oog/camera-punt
 float rotation = 0;
@@ -77,15 +78,7 @@ void loadModels(){
 	glmScale(_models[OBJWATER], 0.5);
 	glmScale(_models[OBJLIFT], 0.5);
 	glmScale(_models[OBJEXIT], 0.5);
-}
-
-//Teken het model
-void drawModel(int modelNr){
- //   GLfloat factor;
-	//factor = glmUnitize(models[modelNr]);						//Schaal het model
-    //glmFacetNormals(models[modelNr]);					
-	//glmVertexNormals(models[modelNr], 90.0);
-  //  glmDraw(models[i], GLM_SMOOTH | GLM_TEXTURE);		//Teken het model
+	glmScale(_models[OBJROBOT], 0.5);
 }
 
 void specialKeys(int key, int x, int y){
@@ -163,18 +156,16 @@ int main(int argc, char **argv){
 	init();
 	
 	//Initialiseer spel
-	loadModels();
-	
-	glEnable(GL_CULL_FACE);									//Backface culling aanzetten (textures alleen buitenkant object
+	loadModels();												//Modellen/objecten inladen en scalen
+	glEnable(GL_CULL_FACE);										//Backface culling aanzetten (textures alleen buitenkant object
 	
 	glutDisplayFunc(display);									//De functie die voor een "redraw" wordt aangeroepen
 	glutReshapeFunc(reshape);									//De functie bij een resize
 	glutKeyboardFunc(keyboard);									//De functie voor het keyboard
 	glutSpecialFunc(specialKeys);								//De functie voor de speciale toetsen
 
-    //Do a little animation - rotate the object a bit so we can see it better DEBUG
-	glutIdleFunc(animate);
-	glutMainLoop();
+	glutIdleFunc(animate);										//Idle functie zorgt o.a. voor de animatie
+	glutMainLoop();												//Default GLUT loop
 
 	return 0;	//Eind programma
 }
@@ -184,9 +175,10 @@ void display(){
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 
+	unsigned int ori = rrGame.getCurOrientation();		//Bepaald waar de robot heen kijkt
+
 	//Als _freeView aanstaat wordt er geen stap gezet
-	if (!_freeView){
-		unsigned int ori = rrGame.getCurOrientation();		//Bepaald waar de robot heen kijkt
+	if (!_freeView){	
 		switch(ori){
 			case NORTH:
 				lookX = 0.0;
@@ -207,15 +199,19 @@ void display(){
 		}
 
 		eyeX = rrGame.getCurPositionX();// + 0.5;
-		eyeY = rrGame.getCurPositionPlatform()*2.0 + 0.5;
+		eyeY = rrGame.getCurPositionPlatform()*2.0;// + 0.5;
 		eyeZ = rrGame.getCurPositionY();// + 0.5;
 	}
 		
-
+	if (_thirdPerson){
+		gluLookAt(eyeX, eyeY + 1.0, eyeZ, 
+			      eyeX + lookX, eyeY - 0.5, eyeZ + lookZ,
+				  0.0f,1.0f,0.0f);
+	} else {
 		gluLookAt(eyeX, eyeY, eyeZ, 
 			      eyeX + lookX, eyeY, eyeZ + lookZ,
 				  0.0f,1.0f,0.0f);
-
+	}
 	//Level tekenen (momenteel 1 laag)
 	//int p = 0;
 	for (int p = 0; p < rrGame.getCurLevel().getPlatforms(); p++){
@@ -291,6 +287,31 @@ void display(){
 			}
 		}
 	}
+
+	//Robot tekenen
+	glPushMatrix();
+	glTranslatef(rrGame.getCurPositionX(),rrGame.getCurPositionPlatform()*2.0,rrGame.getCurPositionY());
+	//Rotatie (welke kant kijkt de robot op?)
+	switch(ori){
+		case NORTH:
+			glRotatef(90.0, 0.0, 1.0, 0.0);
+			break;
+		case EAST:
+			glRotatef(0.0, 0.0, 1.0, 0.0);			
+			break;
+		case SOUTH:
+			glRotatef(-90.0, 0.0, 1.0, 0.0);
+			break;
+		case WEST:
+			glRotatef(180.0, 0.0, 1.0, 0.0);
+			break;
+	}
+	
+
+	glmDraw(_models[OBJROBOT], GLM_SMOOTH | GLM_TEXTURE);
+	glPopMatrix();
+
+
 
 	//Sleep(1);
 	glutSwapBuffers();  
