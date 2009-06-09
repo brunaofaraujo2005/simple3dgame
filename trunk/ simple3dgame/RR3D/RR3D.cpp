@@ -5,8 +5,6 @@ Level inladen: op X as van 0 -> breedte
 			   op Y van lengte -> 0
 
 */
-
-
 #include "stdafx.h"
 #include <windows.h>
 #include <math.h>
@@ -71,6 +69,14 @@ void loadModels(){
 			glmVertexNormals(_models[i], 90.0);
 		}
 	}
+
+	//Objecten scalen
+	glmScale(_models[OBJPLATFORM], 0.5);
+	glmScale(_models[OBJCHIP], 0.25);
+	glmScale(_models[OBJBATTERY], 0.25);
+	glmScale(_models[OBJWATER], 0.5);
+	glmScale(_models[OBJLIFT], 0.5);
+	glmScale(_models[OBJEXIT], 0.5);
 }
 
 //Teken het model
@@ -159,10 +165,8 @@ int main(int argc, char **argv){
 	//Initialiseer spel
 	loadModels();
 	
-	//glEnable(GL_CULL_FACE);									//Backface culling aanzetten (textures alleen buitenkant object
+	glEnable(GL_CULL_FACE);									//Backface culling aanzetten (textures alleen buitenkant object
 	
-
-
 	glutDisplayFunc(display);									//De functie die voor een "redraw" wordt aangeroepen
 	glutReshapeFunc(reshape);									//De functie bij een resize
 	glutKeyboardFunc(keyboard);									//De functie voor het keyboard
@@ -202,9 +206,9 @@ void display(){
 				break;
 		}
 
-		eyeX = rrGame.getCurPositionX() + 0.5;
+		eyeX = rrGame.getCurPositionX();// + 0.5;
 		eyeY = rrGame.getCurPositionPlatform()*2.0 + 0.5;
-		eyeZ = rrGame.getCurPositionY() + 0.5;
+		eyeZ = rrGame.getCurPositionY();// + 0.5;
 	}
 		
 
@@ -220,61 +224,57 @@ void display(){
 				switch (rrGame.getCurLevel().getElement(x,y,p)){
 					case EXIT:
 						glPushMatrix();
-						glTranslatef(x+0.5,p*2.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-						glScalef(0.5,0.5,0.5);//test
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glRotatef(rotation,0,1,0);
 						glmDraw(_models[OBJEXIT], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
+						glPushMatrix();
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
 						break;
-//					case SPACE:
-//						glPushMatrix();
-//						glTranslatef(x+0.5,p,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-//						glScalef(0.5,0.5,0.5);//test
-//						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
-//						glPopMatrix();
-//						break;
 					case LIFT:
 						glPushMatrix();
-						glTranslatef(x+0.5,p*2.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-						glScalef(0.5,0.5,0.5);//test
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJLIFT], GLM_SMOOTH | GLM_TEXTURE);
+						glPopMatrix();
+						glPushMatrix();
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case WATER:
 						glPushMatrix();
-						glTranslatef(x+0.5,p*2.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-						glScalef(0.5,0.5,0.5);//test
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJWATER], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case BATTERY:
 						glPushMatrix();
-						glTranslatef(x+0.5,(p*2.0)+0.30,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,(p*2.0)+0.30,y);		//De Z as representeerd de Y uit de 2D wereld
 						glRotatef(rotation,0,1,0);
-						glScalef(0.25,0.25,0.25);//test
 						glmDraw(_models[OBJBATTERY], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						glPushMatrix();
-						glTranslatef(x+0.5,p*2.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-						glScalef(0.5,0.5,0.5);//test
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case CHIP:
 						glPushMatrix();
-						glTranslatef(x+0.5,(p*2.0)+0.125,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,(p*2.0)+0.125,y);		//De Z as representeerd de Y uit de 2D wereld
 						glRotatef(rotation,0,1,0);					
-						glScalef(0.25,0.25,0.25);//test
+						//glScalef(0.25,0.25,0.25);//test
 						glmDraw(_models[OBJCHIP], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						glPushMatrix();
-						glTranslatef(x+0.5,p*2.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-						glScalef(0.5,0.5,0.5);//test
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case WALL:
 						glPushMatrix();
-						glTranslatef(x+0.5,(p*2.0)+1.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,(p*2.0)+1.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJWALL], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
@@ -283,8 +283,7 @@ void display(){
 						break;
 					default:
 						glPushMatrix();
-						glTranslatef(x+0.5,p*2.0,y+0.5);		//De Z as representeerd de Y uit de 2D wereld
-						glScalef(0.5,0.5,0.5);//test
+						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;

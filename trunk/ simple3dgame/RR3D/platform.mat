@@ -1,2 +1,2 @@
-newmtl robot
-map_Kd robot.tga
+newmtl platform
+map_Kd platform.tga
