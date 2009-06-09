@@ -59,13 +59,10 @@ void loadModels(){
 	_models[OBJWALL]		= glmReadOBJ("Wall.obj");
  	_models[OBJWATER]		= glmReadOBJ("Water.obj");
 
-	//scalefact = glmUnitize(_models[OBJWALL]);
-
+	//Objecten unitizen in het midden zetten van een raster en resizen raster x = -1 tot 1 en y ook
 	for(unsigned int i=0;i<_models.size();i++){
 		if(_models[i]!=NULL){
-			// Schalen van de objecten
 			glmUnitize(_models[i]);
-//			glScalef(scalefact, scalefact, scalefact);
 			glmFacetNormals(_models[i]);        
 			glmVertexNormals(_models[i], 90.0);
 		}
@@ -89,6 +86,12 @@ void specialKeys(int key, int x, int y){
 			else
 				_freeView = true;
 			break;
+		case GLUT_KEY_F2:		//Switchen tussen first en third person view
+			if (_thirdPerson)
+				_thirdPerson = false;
+			else
+				_thirdPerson = true;
+			break;
 		case GLUT_KEY_UP:
 			rrGame.moveRobot(FORWARD);
 			break;
@@ -110,12 +113,6 @@ void keyboard(unsigned char key, int x, int y)
       case 27:
          exit(0);
          break;
-//	 case 'c':
-//		 if (i == 7)
-//			 i = 0;
-//		 else
-//			 i++;
-//		 break;
 	 case 'q':
 		eyeZ += 1.0;
 		break;
@@ -138,13 +135,14 @@ void keyboard(unsigned char key, int x, int y)
    glutPostRedisplay();
 }
 
-void animate()
-{
+//Zorgen dat objecten gaan draaien
+void animate(){
 	rotation+=10.0;
 	if (rotation>360) rotation=0;
 	glutPostRedisplay();
 }
 
+//Main
 int main(int argc, char **argv){
 	glutInit(&argc, argv);										//Initialisser OpenGL
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);	//Kleurmode | Diepte | Buffer
@@ -157,7 +155,7 @@ int main(int argc, char **argv){
 	
 	//Initialiseer spel
 	loadModels();												//Modellen/objecten inladen en scalen
-	glEnable(GL_CULL_FACE);										//Backface culling aanzetten (textures alleen buitenkant object
+	//glEnable(GL_CULL_FACE);										//Backface culling aanzetten (textures alleen buitenkant object
 	
 	glutDisplayFunc(display);									//De functie die voor een "redraw" wordt aangeroepen
 	glutReshapeFunc(reshape);									//De functie bij een resize
@@ -178,7 +176,7 @@ void display(){
 	unsigned int ori = rrGame.getCurOrientation();		//Bepaald waar de robot heen kijkt
 
 	//Als _freeView aanstaat wordt er geen stap gezet
-	if (!_freeView){	
+/*	if (!_freeView){	
 		switch(ori){
 			case NORTH:
 				lookX = 0.0;
@@ -197,19 +195,60 @@ void display(){
 				lookZ = 0.0;
 				break;
 		}
-
+*/
 		eyeX = rrGame.getCurPositionX();// + 0.5;
 		eyeY = rrGame.getCurPositionPlatform()*2.0;// + 0.5;
 		eyeZ = rrGame.getCurPositionY();// + 0.5;
-	}
 		
-	if (_thirdPerson){
-		gluLookAt(eyeX, eyeY + 1.0, eyeZ, 
-			      eyeX + lookX, eyeY - 0.5, eyeZ + lookZ,
+		lookX = eyeX;
+		lookZ = eyeZ;
+
+//	}
+		
+	//Afhankelijk van de view renderen
+	if (_thirdPerson){			//Third person
+		switch(ori){
+			case NORTH:
+				lookZ -= 1.0;
+				eyeZ  += 1.0;
+				break;
+			case EAST:
+				lookX += 1.0;
+				eyeX  -= 1.0;
+				break;
+			case SOUTH:
+				lookZ += 1.0;
+				eyeZ  -= 1.0;
+				break;
+			case WEST:
+				lookX -= 1.0;
+				eyeX  += 1.0;
+				break;
+		}
+		gluLookAt(eyeX, eyeY + 1.1, eyeZ, 
+				  lookX, eyeY, lookZ,
 				  0.0f,1.0f,0.0f);
-	} else {
-		gluLookAt(eyeX, eyeY, eyeZ, 
-			      eyeX + lookX, eyeY, eyeZ + lookZ,
+	} else {					//First person
+		switch(ori){
+			case NORTH:
+				lookZ -= 1.0;
+				eyeZ  += 0.5;
+				break;
+			case EAST:
+				lookX += 1.0;
+				eyeX  -= 0.5;
+				break;
+			case SOUTH:
+				lookZ += 1.0;
+				eyeZ  -= 0.5;
+				break;
+			case WEST:
+				lookX -= 1.0;
+				eyeX  += 0.5;
+				break;
+		}
+		gluLookAt(eyeX, eyeY + 0.5, eyeZ, 
+				  lookX, eyeY + 0.5, lookZ,
 				  0.0f,1.0f,0.0f);
 	}
 	//Level tekenen (momenteel 1 laag)
@@ -288,34 +327,30 @@ void display(){
 		}
 	}
 
-	//Robot tekenen
-	glPushMatrix();
-	glTranslatef(rrGame.getCurPositionX(),rrGame.getCurPositionPlatform()*2.0,rrGame.getCurPositionY());
-	//Rotatie (welke kant kijkt de robot op?)
-	switch(ori){
-		case NORTH:
-			glRotatef(90.0, 0.0, 1.0, 0.0);
-			break;
-		case EAST:
-			glRotatef(0.0, 0.0, 1.0, 0.0);			
-			break;
-		case SOUTH:
-			glRotatef(-90.0, 0.0, 1.0, 0.0);
-			break;
-		case WEST:
-			glRotatef(180.0, 0.0, 1.0, 0.0);
-			break;
-	}
-	
+	//Robot tekenen als je in third person staat of freeview
+	if (_thirdPerson || _freeView){
+		glPushMatrix();
+		glTranslatef(rrGame.getCurPositionX(),rrGame.getCurPositionPlatform()*2.0,rrGame.getCurPositionY());
+		//Rotatie (welke kant kijkt de robot op?)
+		switch(ori){
+			case NORTH:
+				glRotatef(90.0, 0.0, 1.0, 0.0);
+				break;
+			case EAST:
+				glRotatef(0.0, 0.0, 1.0, 0.0);			
+				break;
+			case SOUTH:
+				glRotatef(-90.0, 0.0, 1.0, 0.0);
+				break;
+			case WEST:
+				glRotatef(180.0, 0.0, 1.0, 0.0);
+				break;
+		}
+		glmDraw(_models[OBJROBOT], GLM_SMOOTH | GLM_TEXTURE);
+		glPopMatrix();
+	}	
 
-	glmDraw(_models[OBJROBOT], GLM_SMOOTH | GLM_TEXTURE);
-	glPopMatrix();
-
-
-
-	//Sleep(1);
-	glutSwapBuffers();  
-	
+	glutSwapBuffers();  	
 }
 
 void reshape (int w, int h)
