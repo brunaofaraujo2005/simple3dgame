@@ -1,10 +1,13 @@
 /**
-TODO: - Onder chips (en batterijen?) moet een platform komen.
+TODO:	- Animeren lopen
+		- Objecten afzonderlijk van elkaar laten draaien
+		- Score, Energy, Leven op het scherm
 
 Level inladen: op X as van 0 -> breedte
 			   op Y van lengte -> 0
 
 */
+//Standaard klassen
 #include "stdafx.h"
 #include <windows.h>
 #include <math.h>
@@ -13,31 +16,25 @@ Level inladen: op X as van 0 -> breedte
 #include <gl\gl.h>
 #include <gl\glu.h>
 #include <gl\glut.h>
+#include "glm.h"		//Objecten inladen
 
-#include "glm.h"
-//#include <gl\freeglut.h>
-
-#include "RoboRally.h"
+#include "RoboRally.h"	
 
 using namespace std;
 
 //Objecten met obj, om naamconflict met typedefs te voorkomen
 enum objecten{OBJBATTERY,OBJCHIP,OBJEXIT,OBJLIFT,OBJPLATFORM,OBJROBOT,OBJWALL,OBJWATER};
 
-vector<GLMmodel*> _models;
-
 void display();
 void reshape(int width, int height);
 
-RoboRally rrGame;
-
+RoboRally rrGame;						//Spelinstantie
 bool _freeView = false;					//Freeview (vrij rondvliegen met camera
 bool _thirdPerson = true;				//Thirdperson
 float eyeX,eyeY,eyeZ;					//Camerstandpunten
-float lookX, lookZ;						//Waar wordt er naar gekeken vanuit oog/camera-punt
-float rotation = 0;
-
-GLfloat scalefact;
+float lookX, lookY, lookZ;				//Waar wordt er naar gekeken vanuit oog/camera-punt
+float rotation = 0;						//Rotatiefactor van objecten
+vector<GLMmodel*> _models;				//Bevat alle objecten/modellen/elementen
 
 //Initialisatie
 void init(){
@@ -78,6 +75,7 @@ void loadModels(){
 	glmScale(_models[OBJROBOT], 0.5);
 }
 
+//Afvangen van speciale keyboard input
 void specialKeys(int key, int x, int y){
 	switch(key) {
 		case GLUT_KEY_F1:		//Move camera to players position
@@ -107,32 +105,39 @@ void specialKeys(int key, int x, int y){
 		}
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
-   switch (key) {
-      case 27:
-         exit(0);
-         break;
-	 case 'q':
-		eyeZ += 1.0;
-		break;
-	 case 'e':
-		eyeZ -= 1.0;
-		break;
-	 case 's':
-		 eyeY -= 1.0;
-		 break;
-	 case 'w':
-		 eyeY += 1.0;
-		 break;
-	 case 'a':
-		 eyeX -= 1.0;
-		 break;
-	 case 'd':
-		 eyeX += 1.0;
-		 break;
-   }
-   glutPostRedisplay();
+//Afvangen van keyboard input
+void keyboard(unsigned char key, int x, int y){
+	switch (key) {
+		case 27:
+			exit(0);
+			break;
+		//Vrije camera bewegen (voornml. voor debugging)
+		case 'q':
+			eyeY -= 1.0;
+			break;
+		case 'e':
+			eyeY += 1.0;
+			break;
+		case 's':
+			eyeZ += 1.0;
+			break;
+		case 'w':
+			eyeZ -= 1.0;
+			break;
+		case 'a':
+			eyeX -= 1.0;
+			break;
+		case 'd':
+			eyeX += 1.0;
+			break;
+		case 'r':
+			lookY += 0.5;
+			break;
+		case 'f':
+			lookY -= 0.5;
+			break;
+	}
+	glutPostRedisplay();
 }
 
 //Zorgen dat objecten gaan draaien
@@ -155,7 +160,7 @@ int main(int argc, char **argv){
 	
 	//Initialiseer spel
 	loadModels();												//Modellen/objecten inladen en scalen
-	//glEnable(GL_CULL_FACE);										//Backface culling aanzetten (textures alleen buitenkant object
+	//glEnable(GL_CULL_FACE);									//Backface culling aanzetten (textures alleen buitenkant object
 	
 	glutDisplayFunc(display);									//De functie die voor een "redraw" wordt aangeroepen
 	glutReshapeFunc(reshape);									//De functie bij een resize
@@ -176,149 +181,131 @@ void display(){
 	unsigned int ori = rrGame.getCurOrientation();		//Bepaald waar de robot heen kijkt
 
 	//Als _freeView aanstaat wordt er geen stap gezet
-/*	if (!_freeView){	
-		switch(ori){
-			case NORTH:
-				lookX = 0.0;
-				lookZ = -1.0;
-				break;
-			case EAST:
-				lookX = 90.0;
-				lookZ = 0.0;
-				break;
-			case SOUTH:
-				lookX = 0.0;
-				lookZ = +1.0;
-				break;
-			case WEST:
-				lookX = -90.0;
-				lookZ = 0.0;
-				break;
-		}
-*/
+	if (!_freeView){	
 		eyeX = rrGame.getCurPositionX();// + 0.5;
 		eyeY = rrGame.getCurPositionPlatform()*2.0;// + 0.5;
 		eyeZ = rrGame.getCurPositionY();// + 0.5;
 		
 		lookX = eyeX;
-		lookZ = eyeZ;
-
-//	}
-		
-	//Afhankelijk van de view renderen
-	if (_thirdPerson){			//Third person
-		switch(ori){
-			case NORTH:
-				lookZ -= 1.0;
-				eyeZ  += 1.0;
-				break;
-			case EAST:
-				lookX += 1.0;
-				eyeX  -= 1.0;
-				break;
-			case SOUTH:
-				lookZ += 1.0;
-				eyeZ  -= 1.0;
-				break;
-			case WEST:
-				lookX -= 1.0;
-				eyeX  += 1.0;
-				break;
+		lookZ = eyeZ;		
+		//Afhankelijk van de view renderen
+		if (_thirdPerson){			//Third person
+			switch(ori){
+				case NORTH:
+					lookZ -= 1.0;
+					eyeZ  += 1.0;
+					break;
+				case EAST:
+					lookX += 1.0;
+					eyeX  -= 1.0;
+					break;
+				case SOUTH:
+					lookZ += 1.0;
+					eyeZ  -= 1.0;
+					break;
+				case WEST:
+					lookX -= 1.0;
+					eyeX  += 1.0;
+					break;
+			}
+			gluLookAt(eyeX, eyeY + 1.1, eyeZ, 
+					  lookX, eyeY, lookZ,
+					  0.0f,1.0f,0.0f);
+		} else {					//First person
+			switch(ori){
+				case NORTH:
+					lookZ -= 1.0;
+					eyeZ  += 0.5;
+					break;
+				case EAST:
+					lookX += 1.0;
+					eyeX  -= 0.5;
+					break;
+				case SOUTH:
+					lookZ += 1.0;
+					eyeZ  -= 0.5;
+					break;
+				case WEST:
+					lookX -= 1.0;
+					eyeX  += 0.5;
+					break;
+			}
+			gluLookAt(eyeX, eyeY + 0.5, eyeZ, 
+					  lookX, eyeY + 0.5, lookZ,
+					  0.0f,1.0f,0.0f);
 		}
-		gluLookAt(eyeX, eyeY + 1.1, eyeZ, 
-				  lookX, eyeY, lookZ,
-				  0.0f,1.0f,0.0f);
-	} else {					//First person
-		switch(ori){
-			case NORTH:
-				lookZ -= 1.0;
-				eyeZ  += 0.5;
-				break;
-			case EAST:
-				lookX += 1.0;
-				eyeX  -= 0.5;
-				break;
-			case SOUTH:
-				lookZ += 1.0;
-				eyeZ  -= 0.5;
-				break;
-			case WEST:
-				lookX -= 1.0;
-				eyeX  += 0.5;
-				break;
-		}
+	} else {	//Freeview
 		gluLookAt(eyeX, eyeY + 0.5, eyeZ, 
-				  lookX, eyeY + 0.5, lookZ,
-				  0.0f,1.0f,0.0f);
+			  eyeX, eyeY + 0.05 + lookY, eyeZ - 1,
+			  0.0f,1.0f,0.0f);
 	}
-	//Level tekenen (momenteel 1 laag)
-	//int p = 0;
+
+	//Level tekenen (De Z as representeerd de Y uit de 2D wereld)
 	for (int p = 0; p < rrGame.getCurLevel().getPlatforms(); p++){
 		for (unsigned int x = 0; x < rrGame.getCurLevel().getWidth(); x++){
 			for (unsigned int y = 0; y < rrGame.getCurLevel().getHeight(); y++){
 				switch (rrGame.getCurLevel().getElement(x,y,p)){
 					case EXIT:
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);		
 						glRotatef(rotation,0,1,0);
 						glmDraw(_models[OBJEXIT], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case LIFT:
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJLIFT], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case WATER:
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJWATER], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case BATTERY:
 						glPushMatrix();
-						glTranslatef(x,(p*2.0)+0.30,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,(p*2.0)+0.30,y);
 						glRotatef(rotation,0,1,0);
 						glmDraw(_models[OBJBATTERY], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case CHIP:
 						glPushMatrix();
-						glTranslatef(x,(p*2.0)+0.125,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,(p*2.0)+0.125,y);
 						glRotatef(rotation,0,1,0);					
-						//glScalef(0.25,0.25,0.25);//test
 						glmDraw(_models[OBJCHIP], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case WALL:
 						glPushMatrix();
-						glTranslatef(x,(p*2.0)+1.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,(p*2.0)+1.0,y);
 						glmDraw(_models[OBJWALL], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
 					case HOLE:
-						//Niks
+						//(nog) Niks
 						break;
 					default:
 						glPushMatrix();
-						glTranslatef(x,p*2.0,y);		//De Z as representeerd de Y uit de 2D wereld
+						glTranslatef(x,p*2.0,y);
 						glmDraw(_models[OBJPLATFORM], GLM_SMOOTH | GLM_TEXTURE);
 						glPopMatrix();
 						break;
@@ -349,12 +336,11 @@ void display(){
 		glmDraw(_models[OBJROBOT], GLM_SMOOTH | GLM_TEXTURE);
 		glPopMatrix();
 	}	
-
 	glutSwapBuffers();  	
 }
 
-void reshape (int w, int h)
-{
+//Zorgt dat verhoudingen behouden blijven
+void reshape (int w, int h){
    glViewport(0, 0, (GLsizei) w, (GLsizei) h); 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
