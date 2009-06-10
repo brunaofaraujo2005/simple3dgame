@@ -1,7 +1,7 @@
 /**
 TODO:	- Animeren lopen
 		- Objecten afzonderlijk van elkaar laten draaien
-		- Score, Energy, Leven op het scherm
+		- onderkant muur platform ofzo leggen, zodat niet door plafond wordt gekeken
 
 Level inladen: op X as van 0 -> breedte
 			   op Y van lengte -> 0
@@ -35,6 +35,32 @@ float eyeX,eyeY,eyeZ;					//Camerstandpunten
 float lookX, lookY, lookZ;				//Waar wordt er naar gekeken vanuit oog/camera-punt
 float rotation = 0;						//Rotatiefactor van objecten
 vector<GLMmodel*> _models;				//Bevat alle objecten/modellen/elementen
+
+void print(int x, int y, string text)
+{
+       glPushMatrix ();
+       glLoadIdentity ();
+       glMatrixMode(GL_PROJECTION);
+       glPushMatrix ();
+       glLoadIdentity();
+
+       GLint viewport [4];
+       glGetIntegerv (GL_VIEWPORT, viewport);
+       gluOrtho2D (0,viewport[2], viewport[3], 0);
+
+       glDepthFunc (GL_ALWAYS);
+       glColor3f (100,0,0);
+       glRasterPos2f(x, y);
+       for (int i = 0; i<text.length(); ++i)
+               glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
+       glDepthFunc (GL_LESS);
+       glPopMatrix ();
+       glMatrixMode(GL_MODELVIEW);
+       glPopMatrix ();
+
+	   glColor3f (255,255,255);
+}
+
 
 //Initialisatie
 void init(){
@@ -161,7 +187,8 @@ int main(int argc, char **argv){
 	//Initialiseer spel
 	loadModels();												//Modellen/objecten inladen en scalen
 	//glEnable(GL_CULL_FACE);									//Backface culling aanzetten (textures alleen buitenkant object
-	
+	//glEnable(GL_PROJECTION);
+
 	glutDisplayFunc(display);									//De functie die voor een "redraw" wordt aangeroepen
 	glutReshapeFunc(reshape);									//De functie bij een resize
 	glutKeyboardFunc(keyboard);									//De functie voor het keyboard
@@ -336,15 +363,26 @@ void display(){
 		glmDraw(_models[OBJROBOT], GLM_SMOOTH | GLM_TEXTURE);
 		glPopMatrix();
 	}	
+
+
+	//Width en Height vervangen
+	print(10, 512 - 20, "SCORE: " + toString(rrGame.getCurScore()));
+	print(512/2 - 50, 512 - 20, "ENERGY: " + toString(rrGame.getCurEnergy()));
+	print(512 - 85, 512 - 20, "LIVES: " + toString(rrGame.getCurLives()));
+
+
 	glutSwapBuffers();  	
 }
 
 //Zorgt dat verhoudingen behouden blijven
 void reshape (int w, int h){
+	if(h == 0)
+		h = 1;
+	float ratio = 1.0* w / h;
    glViewport(0, 0, (GLsizei) w, (GLsizei) h); 
    glMatrixMode(GL_PROJECTION);
    glLoadIdentity();
-   gluPerspective(45.0, (GLfloat) w/(GLfloat) h, 1.0, 1000.0);
+   gluPerspective(45.0, ratio, 1.0, 1000.0);
    glMatrixMode (GL_MODELVIEW);
    glLoadIdentity();
 }
