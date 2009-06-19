@@ -35,6 +35,9 @@ float lookX, lookY, lookZ;				//Waar wordt er naar gekeken vanuit oog/camera-pun
 float rotation = 0;						//Rotatiefactor van objecten
 vector<GLMmodel*> _models;				//Bevat alle objecten/modellen/elementen
 int width = 512, height = 512;			//Hoogte en breedte van het scherm
+int frame = 0, time, timebase=0;		//Benodigd om de framerate te bepalen
+float fps;								//Frames per second
+bool _drawFPS = false;					//Teken het aantal frames per second
 
 //Print tekst op het scherm.
 void print(int x, int y, string text, float colorR, float colorG, float colorB){
@@ -115,6 +118,12 @@ void specialKeys(int key, int x, int y){
 				_thirdPerson = false;
 			else
 				_thirdPerson = true;
+			break;
+		case GLUT_KEY_F3:		//Teken het aantal frames per seconde
+			if (_drawFPS)
+				_drawFPS = false;
+			else
+				_drawFPS = true;
 			break;
 		case GLUT_KEY_UP:
 			rrGame.moveRobot(FORWARD);				
@@ -370,7 +379,19 @@ void display(){
 		glPopMatrix();
 	}	
 
+	frame++;
+	time=glutGet(GLUT_ELAPSED_TIME);
+	
+	if (time - timebase > 1000) {
+		fps = (frame*1000.0/(time-timebase));
+	 	timebase = time;		
+		frame = 0;
+	}
+
+
 	//Tekst op het scherm
+	if (_drawFPS)
+		print(20,20,"FPS: "+toString(fps),100.0,0.0,0.0);
 	if (!rrGame.isStarted())
 		print(width/2 - 100, height/2, "Druk op b op te beginnen", 0.0,0.0, 100.0);
 	print(10, height - 20, "SCORE: " + toString(rrGame.getCurScore()), 100.0, 0.0, 0.0);
