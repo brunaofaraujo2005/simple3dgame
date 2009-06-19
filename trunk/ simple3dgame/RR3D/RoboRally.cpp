@@ -2,8 +2,7 @@
 #include "RoboRally.h"
 
 //Default constructor
-RoboRally::RoboRally()
-{
+RoboRally::RoboRally(){
 	init();
 }
 
@@ -16,6 +15,7 @@ void RoboRally::init(){
 	if (_numLevels > 0)
 		initLevel(1);
 
+	_started = false;
 	_curEnergy = _startEnergy;
 	_curLives = _startLives;
 	_curScore = 0;
@@ -32,6 +32,10 @@ void RoboRally::initLevel(unsigned int level){
 
 //Controleert of de robot vooruit kan i.v.m. muur
 bool RoboRally::canMove(directions direction){
+	//Kan alleen als het spel gestart is
+	if (!_started)
+		return false;
+
 	//Afhankelijk van vooruit of achteruit
 	int move;
 	if (direction == FORWARD)
@@ -178,6 +182,7 @@ void RoboRally::refreshState(){
 		case EXIT:
 			//Je gaat naar het volgende level mits het niet het laatste Level was.
 			if (_curLevelNr == _levels.size()){
+				_started = false;
 				initLevel(1);//Gefinished, show hight scores ofzoiets, voor nu een herstart :P
 				return;
 			}
@@ -260,6 +265,11 @@ bool RoboRally::readLevels(string &file){
 	}
 
 	return true;
+}
+
+void RoboRally::startGame(){
+	_started = true;
+	
 }
 
 //Draait de robot linksom

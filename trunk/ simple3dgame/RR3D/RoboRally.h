@@ -6,13 +6,14 @@
 class RoboRally{
 private:
 	//Globale constanten
-	static const unsigned int _startEnergy = 50;//Hoeveel energie je bij start krijgt
+	static const unsigned int _startEnergy = 75;//Hoeveel energie je bij start krijgt
 	static const unsigned int _startLives = 03;	//Aantal levens waar je mee begint
 	static const unsigned int _chipPoints = 10;	//Aantal punten een chip oplevert
 	static const unsigned int _batteryFuel = 10;//Hoeveelheid energie een battery oplevert.
 	static const unsigned int _turnCost = 0;	//Hoeveel energie kost het om te draaien
 	static const unsigned int _walkCost = 1;	//Hoeveel energie kost het om een stap te zetten
 	//Global vars
+	bool _started;								//Houdt bij of het spel gestart is
 	vector<Level> _levels;						//Bevat de levels bij index (level 1 == index 0)
 	unsigned int _numLevels;					//Aantal levels
 	//Ingame vars
@@ -32,6 +33,7 @@ private:
 public:
 	RoboRally();								//Constructor
 	~RoboRally();								//Deconstructor
+	void startGame();							//Start spel
 	void turnRobotLeft();						//Draai de robot naar links
 	void turnRobotRight();						//Draai de robot naar rechts
 	void moveRobot(directions direction);		//Verplaats de robot voor of achteruit
@@ -40,6 +42,7 @@ public:
 	bool canMove(directions direction);			//Controleert of de robot vooruit kan i.v.m. muur
 
 	//Getters
+	bool isStarted(){return _started;};
 	string getCurState();
 	Level getCurLevel(){return _curLevel;};
 	position getCurrentPosition(){return _curPosition;};

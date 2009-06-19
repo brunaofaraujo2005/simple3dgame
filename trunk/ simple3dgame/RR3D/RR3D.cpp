@@ -1,7 +1,6 @@
 /**
 TODO:	- Animeren lopen
 		- Objecten afzonderlijk van elkaar laten draaien
-		- onderkant muur platform ofzo leggen, zodat niet door plafond wordt gekeken
 
 Level inladen: op X as van 0 -> breedte
 			   op Y van lengte -> 0
@@ -35,9 +34,10 @@ float eyeX,eyeY,eyeZ;					//Camerstandpunten
 float lookX, lookY, lookZ;				//Waar wordt er naar gekeken vanuit oog/camera-punt
 float rotation = 0;						//Rotatiefactor van objecten
 vector<GLMmodel*> _models;				//Bevat alle objecten/modellen/elementen
+int width = 512, height = 512;			//Hoogte en breedte van het scherm
 
-void print(int x, int y, string text)
-{
+//Print tekst op het scherm.
+void print(int x, int y, string text, float colorR, float colorG, float colorB){
        glPushMatrix ();
        glLoadIdentity ();
        glMatrixMode(GL_PROJECTION);
@@ -49,7 +49,7 @@ void print(int x, int y, string text)
        gluOrtho2D (0,viewport[2], viewport[3], 0);
 
        glDepthFunc (GL_ALWAYS);
-       glColor3f (100,0,0);
+       glColor3f (colorR, colorG, colorB);
        glRasterPos2f(x, y);
        for (int i = 0; i<text.length(); ++i)
                glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, text[i]);
@@ -64,7 +64,7 @@ void print(int x, int y, string text)
 
 //Initialisatie
 void init(){
-    glClearColor(0.7, 0.7, 0.7, 1.0);	//Schermkleur (achtergrond)
+    glClearColor(0.3, 0.3, 0.3, 1.0);	//Schermkleur (achtergrond)
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
 }
@@ -117,7 +117,7 @@ void specialKeys(int key, int x, int y){
 				_thirdPerson = true;
 			break;
 		case GLUT_KEY_UP:
-			rrGame.moveRobot(FORWARD);
+			rrGame.moveRobot(FORWARD);				
 			break;
 		case GLUT_KEY_DOWN:
 			rrGame.moveRobot(BACKWARD);
@@ -136,6 +136,13 @@ void keyboard(unsigned char key, int x, int y){
 	switch (key) {
 		case 27:
 			exit(0);
+			break;
+		//Spel starten
+		case 'b':
+			rrGame.startGame();
+			break;
+		case 'B':
+			rrGame.startGame();
 			break;
 		//Vrije camera bewegen (voornml. voor debugging)
 		case 'q':
@@ -168,7 +175,7 @@ void keyboard(unsigned char key, int x, int y){
 
 //Zorgen dat objecten gaan draaien
 void animate(){
-	rotation+=10.0;
+	rotation+=10.0;	//Aantal stappen in een keer
 	if (rotation>360) rotation=0;
 	glutPostRedisplay();
 }
@@ -187,7 +194,6 @@ int main(int argc, char **argv){
 	//Initialiseer spel
 	loadModels();												//Modellen/objecten inladen en scalen
 	//glEnable(GL_CULL_FACE);									//Backface culling aanzetten (textures alleen buitenkant object
-	//glEnable(GL_PROJECTION);
 
 	glutDisplayFunc(display);									//De functie die voor een "redraw" wordt aangeroepen
 	glutReshapeFunc(reshape);									//De functie bij een resize
@@ -209,16 +215,16 @@ void display(){
 
 	//Als _freeView aanstaat wordt er geen stap gezet
 	if (!_freeView){	
-		eyeX = rrGame.getCurPositionX();// + 0.5;
-		eyeY = rrGame.getCurPositionPlatform()*2.0;// + 0.5;
-		eyeZ = rrGame.getCurPositionY();// + 0.5;
+		eyeX = rrGame.getCurPositionX();
+		eyeY = rrGame.getCurPositionPlatform()*2.0;
+		eyeZ = rrGame.getCurPositionY();
 		
 		lookX = eyeX;
 		lookZ = eyeZ;		
 		//Afhankelijk van de view renderen
 		if (_thirdPerson){			//Third person
 			switch(ori){
-				case NORTH:
+				case NORTH:					
 					lookZ -= 1.0;
 					eyeZ  += 1.0;
 					break;
@@ -261,14 +267,14 @@ void display(){
 					  lookX, eyeY + 0.5, lookZ,
 					  0.0f,1.0f,0.0f);
 		}
-	} else {	//Freeview
+	} else {		//Freeview
 		gluLookAt(eyeX, eyeY + 0.5, eyeZ, 
-			  eyeX, eyeY + 0.05 + lookY, eyeZ - 1,
-			  0.0f,1.0f,0.0f);
+				  eyeX, eyeY + 0.05 + lookY, eyeZ - 1,
+				  0.0f,1.0f,0.0f);
 	}
 
 	//Level tekenen (De Z as representeerd de Y uit de 2D wereld)
-	for (int p = 0; p < rrGame.getCurLevel().getPlatforms(); p++){
+	for (unsigned int p = 0; p < rrGame.getCurLevel().getPlatforms(); p++){
 		for (unsigned int x = 0; x < rrGame.getCurLevel().getWidth(); x++){
 			for (unsigned int y = 0; y < rrGame.getCurLevel().getHeight(); y++){
 				switch (rrGame.getCurLevel().getElement(x,y,p)){
@@ -364,12 +370,12 @@ void display(){
 		glPopMatrix();
 	}	
 
-
-	//Width en Height vervangen
-	print(10, 512 - 20, "SCORE: " + toString(rrGame.getCurScore()));
-	print(512/2 - 50, 512 - 20, "ENERGY: " + toString(rrGame.getCurEnergy()));
-	print(512 - 85, 512 - 20, "LIVES: " + toString(rrGame.getCurLives()));
-
+	//Tekst op het scherm
+	if (!rrGame.isStarted())
+		print(width/2 - 100, height/2, "Druk op b op te beginnen", 0.0,0.0, 100.0);
+	print(10, height - 20, "SCORE: " + toString(rrGame.getCurScore()), 100.0, 0.0, 0.0);
+	print(width/2.0 - 50, height - 20, "ENERGY: " + toString(rrGame.getCurEnergy()), 100.0, 0.0, 0.0);
+	print(width - 85, height - 20, "LIVES: " + toString(rrGame.getCurLives()), 100.0, 0.0, 0.0);
 
 	glutSwapBuffers();  	
 }
@@ -379,11 +385,12 @@ void reshape (int w, int h){
 	if(h == 0)
 		h = 1;
 	float ratio = 1.0* w / h;
-   glViewport(0, 0, (GLsizei) w, (GLsizei) h); 
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   gluPerspective(45.0, ratio, 1.0, 1000.0);
-   glMatrixMode (GL_MODELVIEW);
-   glLoadIdentity();
+    glViewport(0, 0, (GLsizei) w, (GLsizei) h); 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, ratio, 1.0, 50.0);
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
+	width = w;
+	height = h;
 }
-
