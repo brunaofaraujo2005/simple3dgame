@@ -268,7 +268,9 @@ bool RoboRally::readLevels(string &file){
 	return true;
 }
 
+//Start het spel
 void RoboRally::startGame(){
+	init();
 	_started = true;
 	
 }
