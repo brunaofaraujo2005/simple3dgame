@@ -235,6 +235,7 @@ void RoboRally::reInitLevel(unsigned int lives){
 		_curEnergy = _startEnergy;
 		_curLives = _startLives;
 		_curScore = 0;
+		_started = false;
 	}
 }
 
@@ -274,6 +275,8 @@ void RoboRally::startGame(){
 
 //Draait de robot linksom
 void RoboRally::turnRobotLeft(){
+	if (!_started)
+		return;
 	if (_curOrientation == NORTH)
 		_curOrientation = WEST;
 	else
@@ -283,6 +286,8 @@ void RoboRally::turnRobotLeft(){
 
 //Draait de robot rechtsom
 void RoboRally::turnRobotRight(){
+	if (!_started)
+		return;
 	if (_curOrientation == WEST)
 		_curOrientation = NORTH;
 	else
