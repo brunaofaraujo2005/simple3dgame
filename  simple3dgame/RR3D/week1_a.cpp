@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Level.h"
 
 using namespace std;
