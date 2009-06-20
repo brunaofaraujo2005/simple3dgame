@@ -25,6 +25,7 @@ private:
 	unsigned int _curLives;						//Bevat het aantal levens	
 	unsigned int _curScore;						//Bevat de score van de speler
 	//Methoden
+	bool canMove(directions direction);			//Controleert of de robot vooruit kan i.v.m. muur
 	void init();								//Globale initialisatie
 	void initLevel(unsigned int level);			//Initialiseert een level
 	void refreshState();						//Voert alle game handelingen uit (na bijv. een stap).
@@ -37,9 +38,6 @@ public:
 	void turnRobotLeft();						//Draai de robot naar links
 	void turnRobotRight();						//Draai de robot naar rechts
 	void moveRobot(directions direction);		//Verplaats de robot voor of achteruit
-
-	//********* tijdelijk publiekelijk *********
-	bool canMove(directions direction);			//Controleert of de robot vooruit kan i.v.m. muur
 
 	//Getters
 	bool isStarted(){return _started;};

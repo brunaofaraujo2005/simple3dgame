@@ -1,11 +1,3 @@
-/**
-TODO:	- Animeren lopen
-		- Objecten afzonderlijk van elkaar laten draaien
-
-Level inladen: op X as van 0 -> breedte
-			   op Y van lengte -> 0
-
-*/
 //Standaard klassen
 #include "stdafx.h"
 #include <windows.h>
@@ -15,8 +7,9 @@ Level inladen: op X as van 0 -> breedte
 #include <gl\gl.h>
 #include <gl\glu.h>
 #include <gl\glut.h>
-#include "glm.h"		//Objecten inladen
+#include "glm.h"
 
+//Spel klasse
 #include "RoboRally.h"	
 
 using namespace std;
@@ -393,7 +386,7 @@ void display(){
 	if (_drawFPS)
 		print(20,20,"FPS: "+toString(fps),100.0,0.0,0.0);
 	if (!rrGame.isStarted())
-		print(width/2 - 100, height/2, "Druk op b op te beginnen", 0.0,0.0, 100.0);
+		print(width/2 - 100, height/2, "Druk op B om te beginnen", 0.0,0.0, 100.0);
 	print(10, height - 20, "SCORE: " + toString(rrGame.getCurScore()), 100.0, 0.0, 0.0);
 	print(width/2.0 - 50, height - 20, "ENERGY: " + toString(rrGame.getCurEnergy()), 100.0, 0.0, 0.0);
 	print(width - 85, height - 20, "LIVES: " + toString(rrGame.getCurLives()), 100.0, 0.0, 0.0);

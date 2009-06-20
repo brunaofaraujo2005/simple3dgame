@@ -141,6 +141,7 @@ void Level::setElement(unsigned int x, unsigned int y, unsigned int platform, el
 	_maze[position] = element;
 }
 
+//Verander een bepaalde positie in het level
 void Level::setElement(position point, elements element){
 	setElement(point.x, point.y, point.platform, element);
 }
