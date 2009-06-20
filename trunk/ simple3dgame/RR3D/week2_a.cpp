@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <windows.h>		//Benodigd voor de WIN32 Calls
 #include <GL/gl.h>			//Benodigd voor de OpenGL Calls (Header Module)
 #include <GL/glu.h>			//Benodigd voor de OpenGL Calls (Utilities)
@@ -151,6 +152,9 @@ LONG WINAPI WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam){
 			case 97:	// a
 				rrGame.turnRobotLeft();
 				PostMessage(hWnd, WM_PAINT, 0, 0);
+				break;
+			case 98:
+				rrGame.startGame();
 				break;
 			case 100:	// d
 				rrGame.turnRobotRight();

@@ -1,3 +1,8 @@
+/*
+	Test klasse
+	Representeert RoboRally in ASCII Art.
+*/
+#include "stdafx.h"
 #include "RoboRally.h"
 
 using namespace std;
@@ -21,6 +26,7 @@ bool main(){
 	cout << "\r\nNaar voren: " << rrGame.canMove(FORWARD) ? "true" : "false";
 	cout << "\r\nNaar achteren: " << rrGame.canMove(BACKWARD) ? "true" : "false";
 */
+	rrGame.startGame();
 	char invoer = '0';
 	while (invoer != 'q'){
 		cout << rrGame.getCurState();
